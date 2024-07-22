@@ -7,7 +7,7 @@ import YesterdaysAnswers from "./components/YesterdaysAnswers.vue";
 import Info from "./components/Info.vue";
 import GameWon from "./components/GameWon.vue";
 import MigrationModal from "./components/MigrationModal.vue";
-import allAnswers from "../data/en/allAnswers.json";
+import allAnswers from "../data/de/allAnswers.json";
 import { useMainStore } from "./store";
 import { InfoFilled, Calendar, Sunny, Moon } from "@element-plus/icons-vue";
 

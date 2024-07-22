@@ -1,7 +1,6 @@
 import { setActivePinia, createPinia } from "pinia";
 import { useMainStore } from "../src/store";
 import { beforeEach, describe, it, expect, vi } from "vitest";
-import answers from "../data/en/allAnswers.json";
 
 describe("Store", () => {
   let store;
