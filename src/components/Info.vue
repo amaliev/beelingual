@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Support from "./Support.vue";
-const email = "conor.sheehan.dev@gmail.com";
 </script>
 
 <template>
@@ -39,12 +38,21 @@ const email = "conor.sheehan.dev@gmail.com";
         </el-link>
       </li>
       <li>
-        {{ $t("WordlistSource") }}
+        {{ $t("EnglishWordlistSource") }}
         <el-link
           type="primary"
           href="https://github.com/en-wl/wordlist/blob/master/alt12dicts/2of4brif.txt"
           target="_blank">
           Wordlist
+        </el-link>
+      </li>
+      <li>
+        {{ $t("GermanWordlistSource") }}
+        <el-link
+          type="primary"
+          href="https://github.com/enz/german-wordlist/blob/main/words"
+          target="_blank">
+          wordlist
         </el-link>
       </li>
     </ul>
@@ -55,14 +63,10 @@ const email = "conor.sheehan.dev@gmail.com";
         {{ $t("BugText") }}
         <el-link
           type="primary"
-          href="https://github.com/ConorSheehan1/spelling-bee/issues"
+          href="https://github.com/amaliev/beelingual/issues"
           target="_blank"
           >GitHub</el-link
         >
-        {{ $t("BugTextEmail") }}
-        <el-link type="primary" :href="`mailto:${email}`" target="_blank">{{
-          email
-        }}</el-link>
       </li>
     </ul>
   </div>

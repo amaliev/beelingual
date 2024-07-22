@@ -4,10 +4,14 @@
 // 3. Creates unique puzzle starting points and writes them to various allAnswers$N.json
 // 4. It will also check if today's and yesterday's puzzles have changed. If they have, it provides the option to quit the script.
 
-import { readFileSync, writeFileSync, readdir } from "fs";
+import { readFileSync, writeFileSync, readdirSync } from "fs";
 import cliProgress from "cli-progress";
 import readlineSync from "readline-sync";
 import { generateAnswerObjs, shuffle } from "../src/utils";
+import { Answer } from "../src/models/answer";
+// script will fail if allAnswers.json does not already exist. can just create empty file if running for first time.
+import currentAnswersDe from "./de/allAnswers.json";
+import currentAnswersEn from "./en/allAnswers.json";
 
 // config
 const minNumAnswers = 20;
@@ -16,21 +20,27 @@ const writeSupplementaryFiles = true;
 // need to update to use allAnswers2 10 years from now. see you in the future o_0
 const numPuzzlesPerFile = 3650;
 
-var langs : String[] = [];
-readdir("./data/", (err, dirs) => {
-  dirs.forEach(dir => {
-    langs.push(dir);
-  });
-});
+var langs : string[] = [];
+const files = readdirSync("./data/", { withFileTypes: true });
+for (const file of files) {
+  if (file.isDirectory()) {
+    langs.push(file.name);
+  }
+}
+let currentAnswersMap = new Map<string, Answer[]>([
+  ["de", currentAnswersDe],
+  ["en", currentAnswersEn]
+]);
 
-for (const lang in langs) {
-  // script will fail if allAnswers.json does not already exist. can just create empty file if running for first time.
-  const currentAnswers = await(import("./"+lang+"/allAnswers.json"));
+for (const lang of langs) {
+  if (lang == "en") {
+    continue;
+  }
 
   // TODO: dynamic import in app.vue and here, use variable to ensure script and app use same data
   const answerFile = lang + "/allAnswers.json" // match App.vue
   const gameDate = new Date();
-  const currentAnswerObj = generateAnswerObjs({ allAnswers: currentAnswers, gameDate });
+  const currentAnswerObj = generateAnswerObjs({ allAnswers: currentAnswersMap.get(lang) ?? [], gameDate });
 
   const data = readFileSync("./data/"+lang+"/AllWords.txt");
   const words = data
@@ -87,7 +97,7 @@ for (const lang in langs) {
         let fileNum = numProcessed / numPuzzlesPerFile;
 
         // validation today and yesterdays puzzle hasn't changed
-        const fileName = `./`+lang+`/data/allAnswers${fileNum === 1 ? '' : fileNum}.json`;
+        const fileName = `./data/`+lang+`/allAnswers${fileNum === 1 ? '' : fileNum}.json`;
         if (fileName.endsWith(answerFile)) {
           console.log(`\nChecking file currently in use by the game: ${fileName}`);
           const newCurrentAnswerObj = generateAnswerObjs({ allAnswers, gameDate });

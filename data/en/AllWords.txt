@@ -4390,7 +4390,6 @@ bemoaning
 bemoans
 bemuse
 bemused
-bemused
 bemusing
 bench
 benches
@@ -5101,10 +5100,8 @@ blizzard
 blizzards
 bloat
 bloated
-bloated
 bloater
 bloaters
-bloating
 bloating
 bloats
 blob
@@ -18102,7 +18099,6 @@ epidemiological
 epidemiologist
 epidemiologists
 epidemiology
-epidermis
 epidermis
 epidermises
 epidural

@@ -1,6 +1,6 @@
 // This script adds missing words and removes offensive words from the original wordlists.
 
-import { readFileSync, writeFileSync, readdir }  from "fs";
+import { readFileSync, writeFileSync, readdirSync } from "fs";
 
 const fileToLowerCaseArray = (filePath: string): Array<any> => {
   const data = readFileSync(filePath);
@@ -10,22 +10,24 @@ const fileToLowerCaseArray = (filePath: string): Array<any> => {
     .map((s: string) => s.toLowerCase());
 }
 
-var langs : String[] = [];
-readdir("./data/", (err, dirs) => {
-  dirs.forEach(dir => {
-    langs.push(dir);
-  });
-});
+var langs: String[] = [];
+const files = readdirSync("./data/", { withFileTypes: true });
+for (const file of files) {
+  if (file.isDirectory()) {
+    langs.push(file.name);
+  }
+}
 
-for (const lang in langs) {
-  const originalWords = fileToLowerCaseArray("./data/"+lang+"/AllWords/importDict.txt");
-  const removedWordsSet = new Set(fileToLowerCaseArray("./data/"+lang+"/AllWords/wordsRemoved.txt"));
-  const addedWords = fileToLowerCaseArray("./data/"+lang+"/AllWords/wordsAdded.txt");
+for (const lang of langs) {
+  const originalWords = fileToLowerCaseArray("./data/" + lang + "/AllWords/importedDict.txt");
+  const removedWordsSet = new Set(fileToLowerCaseArray("./data/" + lang + "/AllWords/wordsRemoved.txt"));
+  const addedWords = fileToLowerCaseArray("./data/" + lang + "/AllWords/wordsAdded.txt");
 
-  const allWords = originalWords
+  const allWordsWithDupes = originalWords
     .concat(addedWords)
     .filter(word => !removedWordsSet.has(word))
     .sort();
+  const allWords = [...new Set(allWordsWithDupes)];
 
-  writeFileSync("./data/"+lang+"/AllWords.txt", allWords.join("\n"));
+  writeFileSync("./data/" + lang + "/AllWords.txt", allWords.join("\n"));
 }
