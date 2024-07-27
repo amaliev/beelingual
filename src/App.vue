@@ -6,14 +6,21 @@ import Progress from "./components/Progress.vue";
 import YesterdaysAnswers from "./components/YesterdaysAnswers.vue";
 import Info from "./components/Info.vue";
 import GameWon from "./components/GameWon.vue";
-import MigrationModal from "./components/MigrationModal.vue";
+import LanguagePicker from "./components/LanguagePicker.vue";
 import allAnswers from "../data/de/allAnswers.json";
 import { useMainStore } from "./store";
-import { InfoFilled, Calendar, Sunny, Moon } from "@element-plus/icons-vue";
+import {
+  InfoFilled,
+  Calendar,
+  MapLocation,
+  Sunny,
+  Moon,
+} from "@element-plus/icons-vue";
 
 const store = useMainStore();
 const showYesterdaysAnswers = ref(false);
 const showInfo = ref(false);
+const showLanguagePicker = ref(false);
 const zindex = ref(0);
 const gameWonModalShown = ref(false); // only show gameWon modal once
 let timer: any;
@@ -34,13 +41,6 @@ const showGameWonModal = computed(
   () => store.getProgressPercentage === 100 && gameWonModalShown.value === false
 );
 
-let showMigrationModal = ref(false);
-const checkUrl = () => {
-  showMigrationModal.value = window.location.href.includes(
-    "spelling-b.netlify.app"
-  );
-};
-
 const onOpenCorrectGuesses = () => {
   // without clearing timer, if user toggles correct guesses quickly, it will fade to background after timeout
   clearTimeout(timer);
@@ -55,7 +55,6 @@ const onCloseCorrectGuesses = () => {
 
 onMounted(() => {
   onToggleDarkMode();
-  checkUrl();
 });
 
 store.startGame({ allAnswers });
@@ -67,9 +66,6 @@ store.startGame({ allAnswers });
 </script>
 
 <template>
-  <el-dialog v-model="showMigrationModal" title="URL Migration">
-    <MigrationModal />
-  </el-dialog>
   <el-dialog
     v-model="showGameWonModal"
     @closed="gameWonModalShown = true"
@@ -81,6 +77,12 @@ store.startGame({ allAnswers });
   </el-dialog>
   <el-dialog v-model="showInfo" :title="$t('How to play')">
     <Info />
+  </el-dialog>
+  <el-dialog
+    v-model="showLanguagePicker"
+    :title="$t('Choose a Language')"
+    width="fit-content">
+    <LanguagePicker />
   </el-dialog>
   <div class="common-layout fireworks">
     <div class="beforeFireworks" v-if="showGameWonModal" />
@@ -108,7 +110,15 @@ store.startGame({ allAnswers });
         </el-tooltip>
         <span class="responsive-menu-text">{{ $t("Yesterday") }}</span>
       </el-menu-item>
-      <el-menu-item index="3">
+      <el-menu-item index="3" @click="showLanguagePicker = true">
+        <el-tooltip :content="$t('Language')" placement="top">
+          <el-icon class="menu-icon">
+            <MapLocation />
+          </el-icon>
+        </el-tooltip>
+        <span class="responsive-menu-text">{{ $t("Language") }}</span>
+      </el-menu-item>
+      <el-menu-item index="4">
         <el-switch
           v-model="darkmode"
           @change="onToggleDarkMode"
@@ -207,9 +217,6 @@ h2 span {
     color: $bl-yellow;
     background-color: $bl-yellow !important;
   }
-}
-.el-dialog {
-  width: 80%;
 }
 .el-table {
   --el-table-header-bg-color: unset;
