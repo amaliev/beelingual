@@ -1,3 +1,9 @@
-module.exports = {
-  publicPath: process.env.NODE_ENV === "production" ? "/beelingual/" : "/",
-};
+export default defineConfig({
+  base: "/beelingual/",
+  plugins: [],
+  resolve: {
+    alias: [
+      
+    ]
+  },
+})
