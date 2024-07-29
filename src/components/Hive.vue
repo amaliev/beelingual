@@ -19,9 +19,9 @@ defineProps({
 const store = useMainStore();
 
 const otherLetters = ref(
-  store.availableLetters
+  store.getAvailableLetters
     .split("")
-    .filter((l: string) => l !== store.middleLetter)
+    .filter((l: string) => l !== store.getMiddleLetter)
 );
 let userGuess = ref("");
 
@@ -33,7 +33,7 @@ const onKeyPress = (e: KeyboardEvent) => {
     userGuess.value = userGuess.value.slice(0, -1);
     return false;
   }
-  if (pressedKey.length === 1 && store.availableLetters.includes(pressedKey)) {
+  if (pressedKey.length === 1 && store.getAvailableLetters.includes(pressedKey)) {
     userGuess.value += pressedKey;
     return true;
   }
@@ -57,7 +57,7 @@ onUnmounted(() => {
     <div class="user-guess">
       <strong
         v-for="(letter, index) in userGuess"
-        :class="{ 'middle-letter': letter === store.middleLetter }"
+        :class="{ 'middle-letter': letter === store.getMiddleLetter }"
         :key="`user-guess-${index}`">
         {{ letter }}
       </strong>
@@ -66,7 +66,7 @@ onUnmounted(() => {
     <div class="hive">
       <svg
         class="hive-cell center"
-        @click="userGuess += store.middleLetter"
+        @click="userGuess += store.getMiddleLetter"
         viewBox="0 0 120 104">
         <polygon
           class="cell-fill"
@@ -74,7 +74,7 @@ onUnmounted(() => {
           :stroke="store.getColor"
           stroke-width="7.5" />
         <text class="cell-letter" x="50%" y="50%" dy="10.75%">
-          {{ store.middleLetter }}
+          {{ store.getMiddleLetter }}
         </text>
       </svg>
       <svg

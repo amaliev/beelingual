@@ -7,7 +7,10 @@ import YesterdaysAnswers from "./components/YesterdaysAnswers.vue";
 import Info from "./components/Info.vue";
 import GameWon from "./components/GameWon.vue";
 import LanguagePicker from "./components/LanguagePicker.vue";
-import allAnswers from "../data/de/allAnswers.json";
+import { Answer } from "./models/answer";
+import allAnswersDe from "../data/de/allAnswers.json";
+import allAnswersEn from "../data/en/allAnswers.json";
+
 import { useMainStore } from "./store";
 import {
   InfoFilled,
@@ -57,6 +60,7 @@ onMounted(() => {
   onToggleDarkMode();
 });
 
+const allAnswers = new Map<string, Array<Answer>>([["de", allAnswersDe],["en", allAnswersEn]]);
 store.startGame({ allAnswers });
 // TODO: remove i18n
 // TODO: extra not in spellingbee: track scores across days

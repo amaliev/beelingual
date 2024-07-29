@@ -5,16 +5,16 @@ import { gridify } from "../utils";
 
 const store = useMainStore();
 const gridData = computed(() =>
-  gridify({ arr: Array.from(store.yesterdaysAnswers.sort()), size: 3 })
+  gridify({ arr: Array.from(store.getYesterdaysAnswers.answers.sort()), size: 3 })
 );
 </script>
 
 <template>
   <strong>
     <span
-      v-for="letter in store.yesterdaysAvailableLetters"
+      v-for="letter in store.getYesterdaysAnswers.availableLetters"
       :key="`ydayLetter${letter}`"
-      :class="{ 'middle-letter': letter === store.yesterdaysMiddleLetter }">
+      :class="{ 'middle-letter': letter === store.getYesterdaysAnswers.middleLetter }">
       {{ letter }}
     </span>
   </strong>

@@ -5,25 +5,17 @@ import { ElMessage } from "element-plus";
 import { differenceInDays, isSameDay } from "date-fns";
 import { epoch, generateAnswerObjs, incrementDups } from "./utils";
 import { Answer } from "./models/answer";
+import { State, emptyState } from "./models/state";
 
 export const useMainStore = defineStore({
   id: "main",
   state: () => ({
-    // todays puzzle
-    // correctGuesses as array caused infinite update issue when game was open in multiple tabs. see #6
-    correctGuesses: useStorage("correctGuesses", new Set([]) as Set<string>),
-    answers: useStorage("answers", [] as Array<string>),
-    availableLetters: useStorage("availableLetters", "" as string),
-    middleLetter: useStorage("middleLetter", "" as string),
+    // language-specific state
+    language: useStorage("language", "de" as string),
+    puzzleState: useStorage("puzzleState", new Map<string, State>([["de", emptyState()], ["en", emptyState()]]) as Map<string, State>),
+    // shared state
     gameDate: useStorage("gameDate", epoch as Date),
     lastGameDate: useStorage("lastGameDate", new Date() as Date),
-    // yesterdays puzzle
-    yesterdaysAnswers: useStorage("yesterdaysAnswers", [] as Array<string>),
-    yesterdaysAvailableLetters: useStorage(
-      "yesterdaysAvailableLetters",
-      "" as string
-    ),
-    yesterdaysMiddleLetter: useStorage("yesterdaysMiddleLetter", "" as string),
     theme: useStorage("theme", "light" as string),
     // don't need to be in local storage because they doesn't change
     pointsMessages: {
@@ -37,7 +29,7 @@ export const useMainStore = defineStore({
   getters: {
     // TODO: move getMaxScore, getScoreLevels to state? compute once at startGame
     getMaxScore(): number {
-      return this.answers.reduce((acc: number, word: string): number => {
+      return this.getAnswers.reduce((acc: number, word: string): number => {
         // @ts-ignore issue with this ref? says .calculatePoints is undefined here but not outside arrow funcs
         return acc + this.calculatePoints({ word });
       }, 0);
@@ -70,7 +62,7 @@ export const useMainStore = defineStore({
     },
     // as getter so result can be cached
     getCorrectGuesses(): Array<string> {
-      return Array.from(this.correctGuesses);
+      return Array.from(this.puzzleState.get(this.language)!.correctGuesses);
     },
     getProgressIndex(): number {
       return (
@@ -102,6 +94,18 @@ export const useMainStore = defineStore({
     getGameDateString(): string {
       return this.getGameDate.toISOString().split("T")[0];
     },
+    getAnswers() : Array<string> {
+      return this.puzzleState.get(this.language)!.todaysAnswers.answers;
+    },
+    getAvailableLetters(): string {
+      return this.puzzleState.get(this.language)!.todaysAnswers.availableLetters;
+    },
+    getMiddleLetter(): string {
+      return this.puzzleState.get(this.language)!.todaysAnswers.middleLetter;
+    },
+    getYesterdaysAnswers(): Answer {
+      return this.puzzleState.get(this.language)!.yesterdaysAnswers;
+    }
   },
   actions: {
     showMessage(args: object) {
@@ -116,28 +120,30 @@ export const useMainStore = defineStore({
       });
     },
     submitGuess({ $t, guess }: { $t: Function; guess: string }) {
+      const state = this.puzzleState.get(this.language)!;
+
       if (guess.length < 4) {
         return this.showMessage({
           message: $t("too short"),
         });
       }
-      if (!guess.split("").includes(this.middleLetter)) {
+      if (!guess.split("").includes(state.todaysAnswers.middleLetter)) {
         return this.showMessage({
           message: $t("missing middle letter"),
         });
       }
-      if (!this.answers.includes(guess)) {
+      if (!state.todaysAnswers.answers.includes(guess)) {
         return this.showMessage({
           message: $t("not in word list"),
         });
       }
-      if (this.correctGuesses.has(guess)) {
+      if (state.correctGuesses.has(guess)) {
         return this.showMessage({
           message: $t("already found"),
         });
       }
 
-      this.correctGuesses.add(guess);
+      state.correctGuesses.add(guess);
       const points = this.calculatePoints({ word: guess });
       if (this.isPangram({ word: guess })) {
         this.showMessage({
@@ -151,33 +157,38 @@ export const useMainStore = defineStore({
         });
       }
     },
-    startGame({ allAnswers }: { allAnswers: Array<Answer> }) {
+    startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
       const now = new Date();
       // if it's the same day, don't restart the game
       if (isSameDay(this.getGameDate, now)) return false;
 
       // set gameDate to clear guesses tomorrow
       this.gameDate = now;
-      // new game so reset guesses
-      this.correctGuesses = new Set([]);
 
-      const { todaysAnswerObj, yesterdaysAnswerObj } = generateAnswerObjs({
-        allAnswers,
-        gameDate: this.gameDate,
-      });
-      this.setYesterdaysAnswersAndLastGameDate({ yesterdaysAnswerObj });
+      for (const lang of ["de", "en"]) {
+        // new game so reset guesses
+        this.puzzleState.get(lang)!.correctGuesses = new Set<string>([]);
 
-      // set yesterday and todays answers and letters
-      const { answers, availableLetters, middleLetter } = todaysAnswerObj;
-
-      this.answers = answers;
-      this.availableLetters = availableLetters;
-      this.middleLetter = middleLetter;
+        const { todaysAnswerObj, yesterdaysAnswerObj } = generateAnswerObjs({
+          allAnswers: allAnswers.get(lang)!,
+          gameDate: this.gameDate,
+        });
+        this.setYesterdaysAnswersAndLastGameDate({ yesterdaysAnswerObj, lang });
+  
+        // set yesterday and todays answers and letters
+        const { answers, availableLetters, middleLetter } = todaysAnswerObj;
+  
+        this.puzzleState.get(lang)!.todaysAnswers.answers = answers;
+        this.puzzleState.get(lang)!.todaysAnswers.availableLetters = availableLetters;
+        this.puzzleState.get(lang)!.todaysAnswers.middleLetter = middleLetter;
+      }
     },
     setYesterdaysAnswersAndLastGameDate({
       yesterdaysAnswerObj,
+      lang,
     }: {
       yesterdaysAnswerObj: Answer;
+      lang: string;
     }): string {
       // note: must be run after gameDate is set and before answers, availableLetters, and middleLetter are set!
       // the algorithm used to pick todays and yesterdays answers may change.
@@ -185,9 +196,9 @@ export const useMainStore = defineStore({
       // bug where yesterdays answers were always incorrect at the first of the month.
       // to avoid this, use todays answers from local storage as yesterdays answers if gamedate was yesterday
       if (differenceInDays(this.gameDate, this.lastGameDate) === 1) {
-        this.yesterdaysAnswers = this.answers;
-        this.yesterdaysAvailableLetters = this.availableLetters;
-        this.yesterdaysMiddleLetter = this.middleLetter;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.answers = this.puzzleState.get(lang)!.todaysAnswers.answers;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters = this.puzzleState.get(lang)!.todaysAnswers.availableLetters;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter = this.puzzleState.get(lang)!.todaysAnswers.middleLetter;
         return "local-storage-cache";
       } else {
         const {
@@ -195,9 +206,9 @@ export const useMainStore = defineStore({
           availableLetters: yesterdaysAvailableLetters,
           middleLetter: yesterdaysMiddleLetter,
         } = yesterdaysAnswerObj;
-        this.yesterdaysAnswers = yesterdaysAnswers;
-        this.yesterdaysAvailableLetters = yesterdaysAvailableLetters;
-        this.yesterdaysMiddleLetter = yesterdaysMiddleLetter;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.answers = yesterdaysAnswers;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters = yesterdaysAvailableLetters;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter = yesterdaysMiddleLetter;
         this.lastGameDate = this.gameDate;
         return "cache-bust";
       }

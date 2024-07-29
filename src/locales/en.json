@@ -50,5 +50,7 @@
   "too short": "too short",
   "missing middle letter": "missing middle letter",
   "not in word list": "not in word list",
-  "already found": "already found"
+  "already found": "already found",
+  "Choose a Language": "Choose a Language",
+  "Language": "Language"
 }

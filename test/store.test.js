@@ -1,6 +1,7 @@
 import { setActivePinia, createPinia } from "pinia";
 import { useMainStore } from "../src/store";
 import { beforeEach, describe, it, expect, vi } from "vitest";
+import { Answer } from "../src/models/answer";
 
 describe("Store", () => {
   let store;
@@ -15,9 +16,10 @@ describe("Store", () => {
   describe("getMaxScore", () => {
     it("gets the max score for a given set of words", () => {
       // test: 1, these: 5, three: 5, total: 11
-      store.answers = ["test", "these", "three"];
-      store.availableLetters = "dehorst";
-      store.middleLetter = "t";
+      store.language = "en";
+      store.puzzleState.get("en").todaysAnswers.answers = ["test", "these", "three"];
+      store.puzzleState.get("en").todaysAnswers.availableLetters = "dehorst";
+      store.puzzleState.get("en").todaysAnswers.middleLetter = "t";
       expect(store.getMaxScore).to.equal(11);
     });
   });
@@ -45,7 +47,14 @@ describe("Store", () => {
   });
 
   describe("startGame", () => {
-    const allAnswers = [
+    const allAnswersDe = [
+      {
+        answers: ["danke"],
+        middleLetter: "d",
+        availableLetters: "adeknmn",
+      },
+    ];
+    const allAnswersEn = [
       {
         answers: ["error", "ooze", "otter"],
         middleLetter: "o",
@@ -62,6 +71,9 @@ describe("Store", () => {
         availableLetters: "aeflrst",
       },
     ];
+    var allAnswers = new Map();
+    allAnswers.set("de", allAnswersDe);
+    allAnswers.set("en", allAnswersEn);
     describe("when today is the first of the month and a new game", () => {
       // had issue with incorrect state of yesterdays answers in the past.
       // converting date to int will cause yesterdays answers to be too far in the past.
@@ -75,27 +87,29 @@ describe("Store", () => {
       });
       describe("when gameDate is a date", () => {
         it("should get todays and yesterdays answers correctly", () => {
+          store.language = "en";
           store.startGame({ allAnswers });
-          expect(store.correctGuesses).toEqual(new Set([]));
-          expect(store.answers).toEqual(["felt", "feat", "feet"]);
-          expect(store.availableLetters).toEqual("aeflrst");
-          expect(store.middleLetter).toEqual("l");
-          expect(store.yesterdaysAnswers).toEqual(["eels", "elegies", "elite"]);
-          expect(store.yesterdaysAvailableLetters).toEqual("egilrst");
-          expect(store.yesterdaysMiddleLetter).toEqual("e");
+          expect(store.getCorrectGuesses).toEqual([]);
+          expect(store.getAnswers).toEqual(["felt", "feat", "feet"]);
+          expect(store.getAvailableLetters).toEqual("aeflrst");
+          expect(store.getMiddleLetter).toEqual("l");
+          expect(store.getYesterdaysAnswers.answers).toEqual(["eels", "elegies", "elite"]);
+          expect(store.getYesterdaysAnswers.availableLetters).toEqual("egilrst");
+          expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
         });
       });
       describe("when gameDate is a string", () => {
         it("should get todays and yesterdays answers correctly", () => {
+          store.language = "en";
           store.gameDate = gameDateString;
           store.startGame({ allAnswers });
-          expect(store.correctGuesses).toEqual(new Set([]));
-          expect(store.answers).toEqual(["felt", "feat", "feet"]);
-          expect(store.availableLetters).toEqual("aeflrst");
-          expect(store.middleLetter).toEqual("l");
-          expect(store.yesterdaysAnswers).toEqual(["eels", "elegies", "elite"]);
-          expect(store.yesterdaysAvailableLetters).toEqual("egilrst");
-          expect(store.yesterdaysMiddleLetter).toEqual("e");
+          expect(store.getCorrectGuesses).toEqual([]);
+          expect(store.getAnswers).toEqual(["felt", "feat", "feet"]);
+          expect(store.getAvailableLetters).toEqual("aeflrst");
+          expect(store.getMiddleLetter).toEqual("l");
+          expect(store.getYesterdaysAnswers.answers).toEqual(["eels", "elegies", "elite"]);
+          expect(store.getYesterdaysAnswers.availableLetters).toEqual("egilrst");
+          expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
         });
       });
     });
@@ -110,18 +124,19 @@ describe("Store", () => {
         vi.setSystemTime(gameDate);
       });
       it("should use the local storage cache to load yesterdaysAnswers", () => {
+        store.language = "en";
         store.lastGameDate = lastGameDate;
-        store.answers = ["test", "use", "cache"];
-        store.middleLetter = "e";
-        store.availableLetters = "acehstu";
+        store.puzzleState.get("en").todaysAnswers.answers = ["test", "use", "cache"];
+        store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
+        store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
         store.startGame({ allAnswers });
-        expect(store.correctGuesses).toEqual(new Set([]));
-        expect(store.answers).toEqual(["error", "ooze", "otter"]);
-        expect(store.availableLetters).toEqual("eioprtz");
-        expect(store.middleLetter).toEqual("o");
-        expect(store.yesterdaysAnswers).toEqual(["test", "use", "cache"]);
-        expect(store.yesterdaysAvailableLetters).toEqual("acehstu");
-        expect(store.yesterdaysMiddleLetter).toEqual("e");
+        expect(store.getCorrectGuesses).toEqual([]);
+        expect(store.getAnswers).toEqual(["error", "ooze", "otter"]);
+        expect(store.getAvailableLetters).toEqual("eioprtz");
+        expect(store.getMiddleLetter).toEqual("o");
+        expect(store.getYesterdaysAnswers.answers).toEqual(["test", "use", "cache"]);
+        expect(store.getYesterdaysAnswers.availableLetters).toEqual("acehstu");
+        expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
       });
     });
     describe("when lastGameDate is not yesterday", () => {
@@ -135,20 +150,21 @@ describe("Store", () => {
         vi.setSystemTime(gameDate);
       });
       it("should not use the local storage cache to load yesterdaysAnswers", () => {
+        store.language = "en";
         store.lastGameDate = lastGameDate;
-        store.answers = ["test", "use", "cache"];
-        store.middleLetter = "e";
-        store.availableLetters = "acehstu";
+        store.puzzleState.get("en").todaysAnswers.answers = ["test", "use", "cache"];
+        store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
+        store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
         store.startGame({ allAnswers });
-        expect(store.correctGuesses).toEqual(new Set([]));
-        expect(store.answers).toEqual(["error", "ooze", "otter"]);
-        expect(store.availableLetters).toEqual("eioprtz");
-        expect(store.middleLetter).toEqual("o");
+        expect(store.getCorrectGuesses).toEqual([]);
+        expect(store.getAnswers).toEqual(["error", "ooze", "otter"]);
+        expect(store.getAvailableLetters).toEqual("eioprtz");
+        expect(store.getMiddleLetter).toEqual("o");
         // even though values are cached explicitly above,
         // because lastGameDate was not 1 day ago, we pull new values for yesterdaysAnswers
-        expect(store.yesterdaysAnswers).toEqual(["felt", "feat", "feet"]);
-        expect(store.yesterdaysAvailableLetters).toEqual("aeflrst");
-        expect(store.yesterdaysMiddleLetter).toEqual("l");
+        expect(store.getYesterdaysAnswers.answers).toEqual(["felt", "feat", "feet"]);
+        expect(store.getYesterdaysAnswers.availableLetters).toEqual("aeflrst");
+        expect(store.getYesterdaysAnswers.middleLetter).toEqual("l");
       });
     });
     describe("when today is not a new game", () => {
@@ -161,22 +177,26 @@ describe("Store", () => {
       });
       describe("when gameDate is a date", () => {
         it("should exit early without setting up a new game", () => {
+          store.language = "de";
           store.gameDate = gameDate;
-          store.correctGuesses = new Set(["test"]);
+          store.puzzleState.get("de").correctGuesses = new Set(["test"]);
+          expect(store.getCorrectGuesses).toEqual(["test"]);
           // should exit early
           expect(store.startGame({ allAnswers })).toEqual(false);
           // answers should not be reset to []
-          expect(store.correctGuesses).toEqual(new Set(["test"]));
+          expect(store.getCorrectGuesses).toEqual(["test"]);
         });
       });
       describe("when gameDate is a string", () => {
         it("should exit early without setting up a new game", () => {
+          store.language = "de";
           store.gameDate = gameDateString;
-          store.correctGuesses = new Set(["test"]);
+          store.puzzleState.get("de").correctGuesses = new Set(["test"]);
+          expect(store.getCorrectGuesses).toEqual(["test"]);
           // should exit early
           expect(store.startGame({ allAnswers })).toEqual(false);
           // answers should not be reset to []
-          expect(store.correctGuesses).toEqual(new Set(["test"]));
+          expect(store.getCorrectGuesses).toEqual(["test"]);
         });
       });
     });
