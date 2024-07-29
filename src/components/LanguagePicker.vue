@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useMainStore } from "../store"
+
+const store = useMainStore();
+</script>
+
 <template>
   <div class="language-picker">
     <label>

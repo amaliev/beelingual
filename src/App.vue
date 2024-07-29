@@ -60,7 +60,10 @@ onMounted(() => {
   onToggleDarkMode();
 });
 
-const allAnswers = new Map<string, Array<Answer>>([["de", allAnswersDe],["en", allAnswersEn]]);
+const allAnswers = new Map<string, Array<Answer>>([
+  ["de", allAnswersDe],
+  ["en", allAnswersEn],
+]);
 store.startGame({ allAnswers });
 // TODO: remove i18n
 // TODO: extra not in spellingbee: track scores across days

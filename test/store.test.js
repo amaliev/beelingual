@@ -17,7 +17,11 @@ describe("Store", () => {
     it("gets the max score for a given set of words", () => {
       // test: 1, these: 5, three: 5, total: 11
       store.language = "en";
-      store.puzzleState.get("en").todaysAnswers.answers = ["test", "these", "three"];
+      store.puzzleState.get("en").todaysAnswers.answers = [
+        "test",
+        "these",
+        "three",
+      ];
       store.puzzleState.get("en").todaysAnswers.availableLetters = "dehorst";
       store.puzzleState.get("en").todaysAnswers.middleLetter = "t";
       expect(store.getMaxScore).to.equal(11);
@@ -93,8 +97,14 @@ describe("Store", () => {
           expect(store.getAnswers).toEqual(["felt", "feat", "feet"]);
           expect(store.getAvailableLetters).toEqual("aeflrst");
           expect(store.getMiddleLetter).toEqual("l");
-          expect(store.getYesterdaysAnswers.answers).toEqual(["eels", "elegies", "elite"]);
-          expect(store.getYesterdaysAnswers.availableLetters).toEqual("egilrst");
+          expect(store.getYesterdaysAnswers.answers).toEqual([
+            "eels",
+            "elegies",
+            "elite",
+          ]);
+          expect(store.getYesterdaysAnswers.availableLetters).toEqual(
+            "egilrst"
+          );
           expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
         });
       });
@@ -107,8 +117,14 @@ describe("Store", () => {
           expect(store.getAnswers).toEqual(["felt", "feat", "feet"]);
           expect(store.getAvailableLetters).toEqual("aeflrst");
           expect(store.getMiddleLetter).toEqual("l");
-          expect(store.getYesterdaysAnswers.answers).toEqual(["eels", "elegies", "elite"]);
-          expect(store.getYesterdaysAnswers.availableLetters).toEqual("egilrst");
+          expect(store.getYesterdaysAnswers.answers).toEqual([
+            "eels",
+            "elegies",
+            "elite",
+          ]);
+          expect(store.getYesterdaysAnswers.availableLetters).toEqual(
+            "egilrst"
+          );
           expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
         });
       });
@@ -126,7 +142,11 @@ describe("Store", () => {
       it("should use the local storage cache to load yesterdaysAnswers", () => {
         store.language = "en";
         store.lastGameDate = lastGameDate;
-        store.puzzleState.get("en").todaysAnswers.answers = ["test", "use", "cache"];
+        store.puzzleState.get("en").todaysAnswers.answers = [
+          "test",
+          "use",
+          "cache",
+        ];
         store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
         store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
         store.startGame({ allAnswers });
@@ -134,7 +154,11 @@ describe("Store", () => {
         expect(store.getAnswers).toEqual(["error", "ooze", "otter"]);
         expect(store.getAvailableLetters).toEqual("eioprtz");
         expect(store.getMiddleLetter).toEqual("o");
-        expect(store.getYesterdaysAnswers.answers).toEqual(["test", "use", "cache"]);
+        expect(store.getYesterdaysAnswers.answers).toEqual([
+          "test",
+          "use",
+          "cache",
+        ]);
         expect(store.getYesterdaysAnswers.availableLetters).toEqual("acehstu");
         expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
       });
@@ -152,7 +176,11 @@ describe("Store", () => {
       it("should not use the local storage cache to load yesterdaysAnswers", () => {
         store.language = "en";
         store.lastGameDate = lastGameDate;
-        store.puzzleState.get("en").todaysAnswers.answers = ["test", "use", "cache"];
+        store.puzzleState.get("en").todaysAnswers.answers = [
+          "test",
+          "use",
+          "cache",
+        ];
         store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
         store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
         store.startGame({ allAnswers });
@@ -162,7 +190,11 @@ describe("Store", () => {
         expect(store.getMiddleLetter).toEqual("o");
         // even though values are cached explicitly above,
         // because lastGameDate was not 1 day ago, we pull new values for yesterdaysAnswers
-        expect(store.getYesterdaysAnswers.answers).toEqual(["felt", "feat", "feet"]);
+        expect(store.getYesterdaysAnswers.answers).toEqual([
+          "felt",
+          "feat",
+          "feet",
+        ]);
         expect(store.getYesterdaysAnswers.availableLetters).toEqual("aeflrst");
         expect(store.getYesterdaysAnswers.middleLetter).toEqual("l");
       });

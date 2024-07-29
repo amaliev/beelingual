@@ -33,7 +33,10 @@ const onKeyPress = (e: KeyboardEvent) => {
     userGuess.value = userGuess.value.slice(0, -1);
     return false;
   }
-  if (pressedKey.length === 1 && store.getAvailableLetters.includes(pressedKey)) {
+  if (
+    pressedKey.length === 1 &&
+    store.getAvailableLetters.includes(pressedKey)
+  ) {
     userGuess.value += pressedKey;
     return true;
   }

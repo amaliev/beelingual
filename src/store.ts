@@ -12,7 +12,13 @@ export const useMainStore = defineStore({
   state: () => ({
     // language-specific state
     language: useStorage("language", "de" as string),
-    puzzleState: useStorage("puzzleState", new Map<string, State>([["de", emptyState()], ["en", emptyState()]]) as Map<string, State>),
+    puzzleState: useStorage(
+      "puzzleState",
+      new Map<string, State>([
+        ["de", emptyState()],
+        ["en", emptyState()],
+      ]) as Map<string, State>
+    ),
     // shared state
     gameDate: useStorage("gameDate", epoch as Date),
     lastGameDate: useStorage("lastGameDate", new Date() as Date),
@@ -94,18 +100,19 @@ export const useMainStore = defineStore({
     getGameDateString(): string {
       return this.getGameDate.toISOString().split("T")[0];
     },
-    getAnswers() : Array<string> {
+    getAnswers(): Array<string> {
       return this.puzzleState.get(this.language)!.todaysAnswers.answers;
     },
     getAvailableLetters(): string {
-      return this.puzzleState.get(this.language)!.todaysAnswers.availableLetters;
+      return this.puzzleState.get(this.language)!.todaysAnswers
+        .availableLetters;
     },
     getMiddleLetter(): string {
       return this.puzzleState.get(this.language)!.todaysAnswers.middleLetter;
     },
     getYesterdaysAnswers(): Answer {
       return this.puzzleState.get(this.language)!.yesterdaysAnswers;
-    }
+    },
   },
   actions: {
     showMessage(args: object) {
@@ -174,12 +181,13 @@ export const useMainStore = defineStore({
           gameDate: this.gameDate,
         });
         this.setYesterdaysAnswersAndLastGameDate({ yesterdaysAnswerObj, lang });
-  
+
         // set yesterday and todays answers and letters
         const { answers, availableLetters, middleLetter } = todaysAnswerObj;
-  
+
         this.puzzleState.get(lang)!.todaysAnswers.answers = answers;
-        this.puzzleState.get(lang)!.todaysAnswers.availableLetters = availableLetters;
+        this.puzzleState.get(lang)!.todaysAnswers.availableLetters =
+          availableLetters;
         this.puzzleState.get(lang)!.todaysAnswers.middleLetter = middleLetter;
       }
     },
@@ -196,9 +204,12 @@ export const useMainStore = defineStore({
       // bug where yesterdays answers were always incorrect at the first of the month.
       // to avoid this, use todays answers from local storage as yesterdays answers if gamedate was yesterday
       if (differenceInDays(this.gameDate, this.lastGameDate) === 1) {
-        this.puzzleState.get(lang)!.yesterdaysAnswers.answers = this.puzzleState.get(lang)!.todaysAnswers.answers;
-        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters = this.puzzleState.get(lang)!.todaysAnswers.availableLetters;
-        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter = this.puzzleState.get(lang)!.todaysAnswers.middleLetter;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.answers =
+          this.puzzleState.get(lang)!.todaysAnswers.answers;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters =
+          this.puzzleState.get(lang)!.todaysAnswers.availableLetters;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter =
+          this.puzzleState.get(lang)!.todaysAnswers.middleLetter;
         return "local-storage-cache";
       } else {
         const {
@@ -206,9 +217,12 @@ export const useMainStore = defineStore({
           availableLetters: yesterdaysAvailableLetters,
           middleLetter: yesterdaysMiddleLetter,
         } = yesterdaysAnswerObj;
-        this.puzzleState.get(lang)!.yesterdaysAnswers.answers = yesterdaysAnswers;
-        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters = yesterdaysAvailableLetters;
-        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter = yesterdaysMiddleLetter;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.answers =
+          yesterdaysAnswers;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters =
+          yesterdaysAvailableLetters;
+        this.puzzleState.get(lang)!.yesterdaysAnswers.middleLetter =
+          yesterdaysMiddleLetter;
         this.lastGameDate = this.gameDate;
         return "cache-bust";
       }

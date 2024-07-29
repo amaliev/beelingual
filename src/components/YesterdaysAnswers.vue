@@ -5,7 +5,10 @@ import { gridify } from "../utils";
 
 const store = useMainStore();
 const gridData = computed(() =>
-  gridify({ arr: Array.from(store.getYesterdaysAnswers.answers.sort()), size: 3 })
+  gridify({
+    arr: Array.from(store.getYesterdaysAnswers.answers.sort()),
+    size: 3,
+  })
 );
 </script>
 
@@ -14,7 +17,9 @@ const gridData = computed(() =>
     <span
       v-for="letter in store.getYesterdaysAnswers.availableLetters"
       :key="`ydayLetter${letter}`"
-      :class="{ 'middle-letter': letter === store.getYesterdaysAnswers.middleLetter }">
+      :class="{
+        'middle-letter': letter === store.getYesterdaysAnswers.middleLetter,
+      }">
       {{ letter }}
     </span>
   </strong>

@@ -9,7 +9,15 @@ export interface State {
 export function emptyState() {
   return {
     correctGuesses: new Set<string>(),
-    todaysAnswers: {answers: new Array<string>(), availableLetters: "", middleLetter: ""} as Answer,
-    yesterdaysAnswers: {answers: new Array<string>(), availableLetters: "", middleLetter: ""} as Answer
+    todaysAnswers: {
+      answers: new Array<string>(),
+      availableLetters: "",
+      middleLetter: "",
+    } as Answer,
+    yesterdaysAnswers: {
+      answers: new Array<string>(),
+      availableLetters: "",
+      middleLetter: "",
+    } as Answer,
   } as State;
 }
