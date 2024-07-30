@@ -68,7 +68,7 @@ export const useMainStore = defineStore({
     },
     // as getter so result can be cached
     getCorrectGuesses(): Array<string> {
-      return Array.from(this.puzzleState.get(this.language)!.correctGuesses);
+      return this.puzzleState.get(this.language)!.correctGuesses;
     },
     getProgressIndex(): number {
       return (
@@ -148,13 +148,14 @@ export const useMainStore = defineStore({
           message: $t("not in word list"),
         });
       }
-      if (state.correctGuesses.has(guess)) {
+      if (state.correctGuesses.includes(guess)) {
         return this.showMessage({
           message: $t("already found"),
         });
       }
 
-      state.correctGuesses.add(guess);
+      state.correctGuesses.push(guess);
+      state.correctGuesses = [...new Set(state.correctGuesses)];
       const points = this.calculatePoints({ word: guess });
       if (this.isPangram({ word: guess })) {
         this.showMessage({
@@ -178,7 +179,7 @@ export const useMainStore = defineStore({
 
       for (const lang of ["de", "en"]) {
         // new game so reset guesses
-        this.puzzleState.get(lang)!.correctGuesses = new Set<string>([]);
+        this.puzzleState.get(lang)!.correctGuesses = new Array<string>();
 
         const { todaysAnswerObj, yesterdaysAnswerObj } = generateAnswerObjs({
           allAnswers: allAnswers.get(lang)!,

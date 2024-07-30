@@ -1,14 +1,14 @@
 import { Answer } from "./answer";
 
 export interface State {
-  correctGuesses: Set<string>;
+  correctGuesses: Array<string>;
   todaysAnswers: Answer;
   yesterdaysAnswers: Answer;
 }
 
 export function emptyState() {
   return {
-    correctGuesses: new Set<string>(),
+    correctGuesses: new Array<string>(),
     todaysAnswers: {
       answers: new Array<string>(),
       availableLetters: "",

@@ -211,7 +211,7 @@ describe("Store", () => {
         it("should exit early without setting up a new game", () => {
           store.language = "de";
           store.gameDate = gameDate;
-          store.puzzleState.get("de").correctGuesses = new Set(["test"]);
+          store.puzzleState.get("de").correctGuesses = ["test"];
           expect(store.getCorrectGuesses).toEqual(["test"]);
           // should exit early
           expect(store.startGame({ allAnswers })).toEqual(false);
@@ -223,7 +223,7 @@ describe("Store", () => {
         it("should exit early without setting up a new game", () => {
           store.language = "de";
           store.gameDate = gameDateString;
-          store.puzzleState.get("de").correctGuesses = new Set(["test"]);
+          store.puzzleState.get("de").correctGuesses = ["test"];
           expect(store.getCorrectGuesses).toEqual(["test"]);
           // should exit early
           expect(store.startGame({ allAnswers })).toEqual(false);
