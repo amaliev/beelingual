@@ -98,7 +98,11 @@ export const useMainStore = defineStore({
         : this.gameDate;
     },
     getGameDateString(): string {
-      return this.getGameDate.toISOString().split("T")[0];
+      var date = this.getGameDate.toISOString().split("T")[0];
+      if (date.endsWith("08-06")) {
+        date += " (Happy Birthday, Hannah! ❤️)"
+      }
+      return date;
     },
     getAnswers(): Array<string> {
       return this.puzzleState.get(this.language)!.todaysAnswers.answers;
