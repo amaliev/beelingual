@@ -7,7 +7,7 @@ import { epoch, generateAnswerObjs, incrementDups } from "./utils";
 import { Answer } from "./models/answer";
 import { State, emptyState } from "./models/state";
 
-const kStoreCurrentVersion = 1
+const kStoreCurrentVersion = 1;
 
 export const useMainStore = defineStore({
   id: "main",
@@ -175,7 +175,10 @@ export const useMainStore = defineStore({
     startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
       const now = new Date();
       // Don't restart the game if it's the same day and the store version hasn't updated.
-      if (isSameDay(this.getGameDate, now) && this.version == kStoreCurrentVersion) {
+      if (
+        isSameDay(this.getGameDate, now) &&
+        this.version == kStoreCurrentVersion
+      ) {
         return false;
       }
 

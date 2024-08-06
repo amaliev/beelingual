@@ -79,7 +79,10 @@ store.startGame({ allAnswers });
     title="Congratulations!">
     <GameWon />
   </el-dialog>
-  <el-dialog v-model="showYesterdaysAnswers" :title="$t('Yesterdays Answers')" width="fit-content">
+  <el-dialog
+    v-model="showYesterdaysAnswers"
+    :title="$t('Yesterdays Answers')"
+    width="fit-content">
     <YesterdaysAnswers />
   </el-dialog>
   <el-dialog v-model="showInfo" :title="$t('How to play')">
