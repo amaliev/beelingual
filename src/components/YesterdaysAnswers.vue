@@ -4,12 +4,15 @@ import { useMainStore } from "../store";
 import { gridify } from "../utils";
 
 const store = useMainStore();
-const gridData = computed(() =>
+const size = Math.floor(window.innerWidth / 150);
+const gridColumns = [...Array(size).keys()].map(key => key + 1);
+const gridData = computed(() => 
   gridify({
     arr: Array.from(store.getYesterdaysAnswers.answers.sort()),
-    size: 3,
+    size: size,
   })
 );
+
 </script>
 
 <template>
@@ -24,9 +27,7 @@ const gridData = computed(() =>
     </span>
   </strong>
   <el-table :data="gridData" :cell-class-name="store.cellClassName">
-    <el-table-column property="1" label="" />
-    <el-table-column property="2" label="" />
-    <el-table-column property="3" label="" />
+    <el-table-column v-for="column in gridColumns" :property="String(column)" label="" width="100" />
   </el-table>
 </template>
 

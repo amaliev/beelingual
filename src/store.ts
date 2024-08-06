@@ -7,10 +7,13 @@ import { epoch, generateAnswerObjs, incrementDups } from "./utils";
 import { Answer } from "./models/answer";
 import { State, emptyState } from "./models/state";
 
+const kStoreCurrentVersion = 1
+
 export const useMainStore = defineStore({
   id: "main",
   state: () => ({
     // language-specific state
+    version: useStorage("version", kStoreCurrentVersion as number),
     language: useStorage("language", "de" as string),
     puzzleState: useStorage(
       "puzzleState",
@@ -171,8 +174,10 @@ export const useMainStore = defineStore({
     },
     startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
       const now = new Date();
-      // if it's the same day, don't restart the game
-      if (isSameDay(this.getGameDate, now)) return false;
+      // Don't restart the game if it's the same day and the store version hasn't updated.
+      if (isSameDay(this.getGameDate, now) && this.version == kStoreCurrentVersion) {
+        return false;
+      }
 
       // set gameDate to clear guesses tomorrow
       this.gameDate = now;
