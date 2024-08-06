@@ -85,7 +85,7 @@ store.startGame({ allAnswers });
     width="fit-content">
     <YesterdaysAnswers />
   </el-dialog>
-  <el-dialog v-model="showInfo" :title="$t('How to play')">
+  <el-dialog v-model="showInfo" :title="$t('How to play')" width="fit-content">
     <Info />
   </el-dialog>
   <el-dialog
