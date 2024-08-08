@@ -7,10 +7,11 @@ config.global.mocks.$t = (v) => v;
 
 describe("App.vue", () => {
   let testDate = "2023-02-03";
+  let timeZone = "T05:00:00";
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(testDate));
+    vi.setSystemTime(new Date(testDate+timeZone));
   });
   it("should render the date in the title", () => {
     const testMessage = `Spelling Bee ${testDate}`;

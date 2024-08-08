@@ -34,22 +34,6 @@ describe("Store", () => {
     });
   });
 
-  describe("getGameDate", () => {
-    let testDate = "2024-12-11";
-    beforeEach(() => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date(testDate));
-    });
-    it("should return a date object when gameDate is a string", () => {
-      store.gameDate = testDate;
-      expect(store.getGameDate).toEqual(new Date(testDate));
-    });
-    it("should return a date object when gameDate is a date", () => {
-      store.gameDate = new Date(testDate);
-      expect(store.getGameDate).toEqual(new Date(testDate));
-    });
-  });
-
   describe("startGame", () => {
     const allAnswersDe = [
       {
@@ -83,7 +67,7 @@ describe("Store", () => {
       // converting date to int will cause yesterdays answers to be too far in the past.
       //  e.g. 2022-01-01 -> 20220101 but yesterdays answers should be 2021-12-31, but would be 20220100
       let gameDate;
-      let gameDateString = "2222-02-01";
+      let gameDateString = "2222-02-01T12:00:00";
       beforeEach(() => {
         gameDate = new Date(gameDateString);
         vi.useFakeTimers();
@@ -133,8 +117,8 @@ describe("Store", () => {
       let gameDate;
       let lastGameDate;
       beforeEach(() => {
-        gameDate = new Date("2222-02-05");
-        lastGameDate = new Date("2222-02-04");
+        gameDate = new Date("2222-02-05T12:00:00");
+        lastGameDate = new Date("2222-02-04T12:00:00");
         store.gameDate = lastGameDate;
         vi.useFakeTimers();
         vi.setSystemTime(gameDate);
@@ -167,8 +151,8 @@ describe("Store", () => {
       let gameDate;
       let lastGameDate;
       beforeEach(() => {
-        gameDate = new Date("2222-02-05");
-        lastGameDate = new Date("2222-02-03");
+        gameDate = new Date("2222-02-05T12:00:00");
+        lastGameDate = new Date("2222-02-03T12:00:00");
         store.gameDate = lastGameDate;
         vi.useFakeTimers();
         vi.setSystemTime(gameDate);
@@ -201,7 +185,7 @@ describe("Store", () => {
     });
     describe("when today is not a new game", () => {
       let gameDate;
-      let gameDateString = "2023-02-23";
+      let gameDateString = "2023-02-23T12:00:00";
       beforeEach(() => {
         gameDate = new Date(gameDateString);
         vi.useFakeTimers();
@@ -211,18 +195,6 @@ describe("Store", () => {
         it("should exit early without setting up a new game", () => {
           store.language = "de";
           store.gameDate = gameDate;
-          store.puzzleState.get("de").correctGuesses = ["test"];
-          expect(store.getCorrectGuesses).toEqual(["test"]);
-          // should exit early
-          expect(store.startGame({ allAnswers })).toEqual(false);
-          // answers should not be reset to []
-          expect(store.getCorrectGuesses).toEqual(["test"]);
-        });
-      });
-      describe("when gameDate is a string", () => {
-        it("should exit early without setting up a new game", () => {
-          store.language = "de";
-          store.gameDate = gameDateString;
           store.puzzleState.get("de").correctGuesses = ["test"];
           expect(store.getCorrectGuesses).toEqual(["test"]);
           // should exit early

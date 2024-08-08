@@ -143,7 +143,7 @@ store.startGame({ allAnswers });
     <Progress />
     <CorrectGuesses
       @open="onOpenCorrectGuesses"
-      @close="onCloseCorrectGuesses" />
+      @close="onCloseCorrectGuesses" :key="store.language"/>
     <Hive :ZIndex="zindex" :key="store.language" />
   </div>
 </template>

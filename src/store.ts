@@ -95,13 +95,10 @@ export const useMainStore = defineStore({
       return this.theme === "light" ? "white" : "#1c1b22";
     },
     getGameDate(): Date {
-      // handle case where gameDate may still be string in localStorage from previous code
-      return typeof this.gameDate === "string"
-        ? new Date(this.gameDate)
-        : this.gameDate;
+      return this.gameDate;
     },
     getGameDateString(): string {
-      var date = this.getGameDate.toISOString().split("T")[0];
+      var date = this.gameDate.toISOString().split("T")[0];
       if (date.endsWith("08-06")) {
         date += " (Happy Birthday, Hannah! ❤️)";
       }
@@ -158,7 +155,6 @@ export const useMainStore = defineStore({
       }
 
       state.correctGuesses.push(guess);
-      state.correctGuesses = [...new Set(state.correctGuesses)];
       const points = this.calculatePoints({ word: guess });
       if (this.isPangram({ word: guess })) {
         this.showMessage({
@@ -173,10 +169,14 @@ export const useMainStore = defineStore({
       }
     },
     startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
-      const now = new Date();
+      const date = new Date();
+      const utcTime = date.getTime() + date.getTimezoneOffset() * 60000;
+      const edtTime = utcTime + (3600000 * -4);
+      const now = new Date(edtTime);
+
       // Don't restart the game if it's the same day and the store version hasn't updated.
       if (
-        isSameDay(this.getGameDate, now) &&
+        isSameDay(this.gameDate, now) &&
         this.version == kStoreCurrentVersion
       ) {
         return false;
@@ -216,7 +216,9 @@ export const useMainStore = defineStore({
       // e.g. https://github.com/ConorSheehan1/spelling-bee/issues/3
       // bug where yesterdays answers were always incorrect at the first of the month.
       // to avoid this, use todays answers from local storage as yesterdays answers if gamedate was yesterday
-      if (differenceInDays(this.gameDate, this.lastGameDate) === 1) {
+      var trimmedGameDate = new Date(this.gameDate.toDateString());
+      var trimmedLastGameDate = new Date(this.lastGameDate.toDateString());
+      if (differenceInDays(trimmedGameDate, trimmedLastGameDate) === 1) {
         this.puzzleState.get(lang)!.yesterdaysAnswers.answers =
           this.puzzleState.get(lang)!.todaysAnswers.answers;
         this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters =
