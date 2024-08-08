@@ -11,7 +11,7 @@ describe("App.vue", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.useFakeTimers();
-    vi.setSystemTime(new Date(testDate+timeZone));
+    vi.setSystemTime(new Date(testDate + timeZone));
   });
   it("should render the date in the title", () => {
     const testMessage = `Spelling Bee ${testDate}`;

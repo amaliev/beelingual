@@ -171,7 +171,7 @@ export const useMainStore = defineStore({
     startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
       const date = new Date();
       const utcTime = date.getTime() + date.getTimezoneOffset() * 60000;
-      const edtTime = utcTime + (3600000 * -4);
+      const edtTime = utcTime + 3600000 * -4;
       const now = new Date(edtTime);
 
       // Don't restart the game if it's the same day and the store version hasn't updated.

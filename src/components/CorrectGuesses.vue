@@ -22,7 +22,7 @@ const numCorrectMessage = computed(() => {
 
 const lastFiveGuesses = computed(() => {
   const numGuessesToShow = Math.min(store.getCorrectGuesses.length, 5);
-  return store.getCorrectGuesses.reverse().slice(0, numGuessesToShow);
+  return store.getCorrectGuesses.slice().reverse().slice(0, numGuessesToShow);
 });
 
 // alphabetical when expanded, in order found when collapsed.
