@@ -233,7 +233,8 @@ export const useMainStore = defineStore({
           this.puzzleState.get(lang)!.todaysAnswers.middleLetter;
         return "local-storage-cache";
       } else {
-        this.puzzleState.get(lang)!.yesterdaysCorrectGuesses = new Array<string>();
+        this.puzzleState.get(lang)!.yesterdaysCorrectGuesses =
+          new Array<string>();
 
         const {
           answers: yesterdaysAnswers,
