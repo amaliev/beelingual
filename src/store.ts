@@ -281,7 +281,7 @@ export const useMainStore = defineStore({
           return "guessed";
         }
         if (this.isPangram({ word })) {
-          return "pangramguessed";
+          return "pangram";
         }
       }
     },
