@@ -7,7 +7,7 @@ config.global.mocks.$t = (v) => v;
 
 describe("App.vue", () => {
   let testDate = "2023-02-03";
-  let timeZone = "T05:00:00";
+  let timeZone = "T12:00:00";
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.useFakeTimers();

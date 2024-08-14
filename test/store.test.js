@@ -90,6 +90,7 @@ describe("Store", () => {
             "egilrst"
           );
           expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
+          expect(store.getYesterdaysCorrectGuesses).toEqual([]);
         });
       });
       describe("when gameDate is a string", () => {
@@ -110,6 +111,7 @@ describe("Store", () => {
             "egilrst"
           );
           expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
+          expect(store.getYesterdaysCorrectGuesses).toEqual([]);
         });
       });
     });
@@ -133,6 +135,7 @@ describe("Store", () => {
         ];
         store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
         store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
+        store.puzzleState.get("en").correctGuesses = ["test", "use"];
         store.startGame({ allAnswers });
         expect(store.getCorrectGuesses).toEqual([]);
         expect(store.getAnswers).toEqual(["error", "ooze", "otter"]);
@@ -145,6 +148,7 @@ describe("Store", () => {
         ]);
         expect(store.getYesterdaysAnswers.availableLetters).toEqual("acehstu");
         expect(store.getYesterdaysAnswers.middleLetter).toEqual("e");
+        expect(store.getYesterdaysCorrectGuesses).toEqual(["test", "use"]);
       });
     });
     describe("when lastGameDate is not yesterday", () => {
@@ -167,6 +171,7 @@ describe("Store", () => {
         ];
         store.puzzleState.get("en").todaysAnswers.middleLetter = "e";
         store.puzzleState.get("en").todaysAnswers.availableLetters = "acehstu";
+        store.puzzleState.get("en").correctGuesses = ["feat", "feet"];
         store.startGame({ allAnswers });
         expect(store.getCorrectGuesses).toEqual([]);
         expect(store.getAnswers).toEqual(["error", "ooze", "otter"]);
@@ -181,6 +186,7 @@ describe("Store", () => {
         ]);
         expect(store.getYesterdaysAnswers.availableLetters).toEqual("aeflrst");
         expect(store.getYesterdaysAnswers.middleLetter).toEqual("l");
+        expect(store.getYesterdaysCorrectGuesses).toEqual([]);
       });
     });
     describe("when today is not a new game", () => {
@@ -201,6 +207,7 @@ describe("Store", () => {
           expect(store.startGame({ allAnswers })).toEqual(false);
           // answers should not be reset to []
           expect(store.getCorrectGuesses).toEqual(["test"]);
+          expect(store.getYesterdaysCorrectGuesses).toEqual([]);
         });
       });
     });

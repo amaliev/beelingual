@@ -263,6 +263,14 @@ h2 span {
   font-weight: bold;
 }
 
+.guessed {
+  background-color: $bl-yellow;
+}
+.pangramguessed {
+  font-weight: bold;
+  background-color: $bl-yellow;
+}
+
 .toast-message {
   max-width: 80%;
   margin: 0, 1em;
@@ -275,6 +283,13 @@ html.dark {
   }
   .pangram {
     color: $bl-yellow;
+  }
+  .guessed {
+    background-color: $bl-dark-grey;
+  }
+  .pangramguessed {
+    color: $bl-yellow;
+    background-color: $bl-dark-grey;
   }
 }
 

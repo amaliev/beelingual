@@ -7,7 +7,7 @@ import { epoch, generateAnswerObjs, incrementDups } from "./utils";
 import { Answer } from "./models/answer";
 import { State, emptyState } from "./models/state";
 
-const kStoreCurrentVersion = 1;
+const kStoreCurrentVersion = 2;
 
 export const useMainStore = defineStore({
   id: "main",
@@ -72,6 +72,9 @@ export const useMainStore = defineStore({
     // as getter so result can be cached
     getCorrectGuesses(): Array<string> {
       return this.puzzleState.get(this.language)!.correctGuesses;
+    },
+    getYesterdaysCorrectGuesses(): Array<string> {
+      return this.puzzleState.get(this.language)!.yesterdaysCorrectGuesses;
     },
     getProgressIndex(): number {
       return (
@@ -171,8 +174,8 @@ export const useMainStore = defineStore({
     startGame({ allAnswers }: { allAnswers: Map<string, Array<Answer>> }) {
       const date = new Date();
       const utcTime = date.getTime() + date.getTimezoneOffset() * 60000;
-      const edtTime = utcTime + 3600000 * -4;
-      const now = new Date(edtTime);
+      const pdtTime = utcTime + 3600000 * -7;
+      const now = new Date(pdtTime);
 
       // Don't restart the game if it's the same day and the store version hasn't updated.
       if (
@@ -186,14 +189,14 @@ export const useMainStore = defineStore({
       this.gameDate = now;
 
       for (const lang of ["de", "en"]) {
-        // new game so reset guesses
-        this.puzzleState.get(lang)!.correctGuesses = new Array<string>();
-
         const { todaysAnswerObj, yesterdaysAnswerObj } = generateAnswerObjs({
           allAnswers: allAnswers.get(lang)!,
           gameDate: this.gameDate,
         });
         this.setYesterdaysAnswersAndLastGameDate({ yesterdaysAnswerObj, lang });
+
+        // reset guesses after filling yesterdaysCorrectGuesses
+        this.puzzleState.get(lang)!.correctGuesses = new Array<string>();
 
         // set yesterday and todays answers and letters
         const { answers, availableLetters, middleLetter } = todaysAnswerObj;
@@ -219,6 +222,9 @@ export const useMainStore = defineStore({
       var trimmedGameDate = new Date(this.gameDate.toDateString());
       var trimmedLastGameDate = new Date(this.lastGameDate.toDateString());
       if (differenceInDays(trimmedGameDate, trimmedLastGameDate) === 1) {
+        this.puzzleState.get(lang)!.yesterdaysCorrectGuesses =
+          this.puzzleState.get(lang)!.correctGuesses;
+
         this.puzzleState.get(lang)!.yesterdaysAnswers.answers =
           this.puzzleState.get(lang)!.todaysAnswers.answers;
         this.puzzleState.get(lang)!.yesterdaysAnswers.availableLetters =
@@ -227,6 +233,8 @@ export const useMainStore = defineStore({
           this.puzzleState.get(lang)!.todaysAnswers.middleLetter;
         return "local-storage-cache";
       } else {
+        this.puzzleState.get(lang)!.yesterdaysCorrectGuesses = new Array<string>();
+
         const {
           answers: yesterdaysAnswers,
           availableLetters: yesterdaysAvailableLetters,
@@ -264,8 +272,16 @@ export const useMainStore = defineStore({
     },
     cellClassName({ row, columnIndex }: { row: any; columnIndex: number }) {
       const word = row[columnIndex + 1];
-      if (word && this.isPangram({ word })) {
-        return "pangram";
+      if (word) {
+        if (this.getYesterdaysCorrectGuesses.includes(word)) {
+          if (this.isPangram({ word })) {
+            return "pangramguessed";
+          }
+          return "guessed";
+        }
+        if (this.isPangram({ word })) {
+          return "pangramguessed";
+        }
       }
     },
   },
