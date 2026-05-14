@@ -99,7 +99,7 @@ store.startGame({ allAnswers });
     <div class="afterFireworks" v-if="showGameWonModal" />
     <el-header height="2em" id="title-header">
       <h2>
-        <strong> Spelling Bee </strong>
+        <strong> Beelingual </strong>
         <span> {{ store.getGameDateString }} </span>
       </h2>
     </el-header>
